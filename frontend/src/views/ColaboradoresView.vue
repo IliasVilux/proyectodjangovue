@@ -1,29 +1,31 @@
 <script>
+import ColaboradorCard from '../components/ColaboradorCard.vue';
 import gql from 'graphql-tag';
 
 export default {
-  apollo: {
-    colaborador: gql`
+    apollo: {
+        colaboradores: gql `
       query {
-        colaborador(dniCifColaborador: "99999999M") {
+        colaboradores {
           dniCifColaborador 
           nombreColaborador
         }
-      }`,
-  },
-  data() {
-    return {
-      colaborador: null,
-    };
-  },
+      }
+    `,
+    },
+    data() {
+        return {
+            colaborador: null,
+        };
+    },
+    components: { ColaboradorCard }
 };
 </script>
 
-
-
 <template>
   <main>
-    <!-- <ColaboradorCard dni="999999I" nombre="Ilias"/>
-    <ColaboradorCard dni="123345678" nombre="Otro Usuario"/> -->
+    <div v-for="colaborador in colaboradores" :key="colaborador.dniCifColaborador">
+      <ColaboradorCard :dni="colaborador.dniCifColaborador" :nombre="colaborador.nombreColaborador"/>
+    </div>
   </main>
 </template>
