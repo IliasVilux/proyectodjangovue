@@ -30,18 +30,7 @@ const { mutate: deleteColaborador } = useMutation(
         message
       }
     }
-  `,
-  {
-    update: (cache, { data: { deleteColaborador } }) => {
-      cache.modify({
-        fields: {
-          colaborador(existingColaboradorRef, { DELETE }) {
-            return DELETE;
-          },
-        },
-      });
-    },
-  }
+  `
 )
 </script>
 
