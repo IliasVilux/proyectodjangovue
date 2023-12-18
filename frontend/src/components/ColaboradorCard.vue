@@ -10,32 +10,19 @@ const props = defineProps({
 })
 
 // Pasandole el param dni de props
-// const { result } = useQuery(gql`
-//   query colaborador($dniCifColaborador: String!) {
-//     colaborador(dniCifColaborador: $dniCifColaborador) {
-//       dniCifColaborador
-//       nombreColaborador
-//       apellidosColaborador
-//     }
-//   }
-// `, { variables: { dniCifColaborador: props.dni } })
-
-// Pasandole un parametro a mano
 const { result } = useQuery(gql`
-  query colaborador {
-    colaborador(dniCifColaborador: "99999999M") {
+  query colaborador($dniCifColaborador: String!) {
+    colaborador(dniCifColaborador: $dniCifColaborador) {
       dniCifColaborador
       nombreColaborador
       apellidosColaborador
     }
   }
-`)
-
-console.log(result)
+`, { dniCifColaborador: props.dni })
 </script>
 
 <template>
-  <div class="colaboradorCard">
+  <div v-if="result && result.colaborador" class="colaboradorCard">
     <div>
       <p>
         {{ result.colaborador.nombreColaborador }} {{ result.colaborador.apellidosColaborador }}

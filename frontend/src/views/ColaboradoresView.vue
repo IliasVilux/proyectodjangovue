@@ -25,6 +25,7 @@ export default {
   <main>
     <ul>
       <ColaboradorCard
+        v-if="result && result.colaboradores"
         v-for="colaborador in result.colaboradores"
         :key="colaborador.dniCifColaborador"
         :dni="colaborador.dniCifColaborador"
