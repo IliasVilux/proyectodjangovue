@@ -1,4 +1,5 @@
 <script>
+import { RouterLink } from 'vue-router'
 import ColaboradorCard from '../components/ColaboradorCard.vue'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
@@ -23,6 +24,7 @@ export default {
 
 <template>
   <main>
+    <RouterLink to="/add">Crear</RouterLink>
     <ul>
       <ColaboradorCard
         v-if="result && result.colaboradores"
@@ -33,3 +35,9 @@ export default {
     </ul>
   </main>
 </template>
+
+<style scoped>
+  ul{
+    padding: 0;
+  }
+</style>

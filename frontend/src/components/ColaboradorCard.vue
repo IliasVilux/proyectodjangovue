@@ -23,13 +23,26 @@ const { result } = useQuery(
   { dniCifColaborador: props.dni }
 )
 
-const { mutate: deleteColaborador } = useMutation(gql`
-  mutation deleteColaborador($dniCifColaborador: String!) {
-    deleteColaborador(dniCifColaborador: $dniCifColaborador) {
-      message
+const { mutate: deleteColaborador } = useMutation(
+  gql`
+    mutation deleteColaborador($dniCifColaborador: String!) {
+      deleteColaborador(dniCifColaborador: $dniCifColaborador) {
+        message
+      }
     }
+  `,
+  {
+    update: (cache, { data: { deleteColaborador } }) => {
+      cache.modify({
+        fields: {
+          colaborador(existingColaboradorRef, { DELETE }) {
+            return DELETE;
+          },
+        },
+      });
+    },
   }
-`)
+)
 </script>
 
 <template>
@@ -38,7 +51,7 @@ const { mutate: deleteColaborador } = useMutation(gql`
       <p>
         {{ result.colaborador.nombreColaborador }} {{ result.colaborador.apellidosColaborador }}
       </p>
-      <p>{{ result.colaborador.dniCifColaborador }}</p>
+      <p style="color: #9aa0a6;">{{ result.colaborador.dniCifColaborador }}</p>
     </div>
     <div>
       <button class="editBtn">
