@@ -1,6 +1,7 @@
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
+import { useQuery } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 
 const props = defineProps({
   dni: {
@@ -9,16 +10,26 @@ const props = defineProps({
   }
 })
 
-// Pasandole el param dni de props
-const { result } = useQuery(gql`
-  query colaborador($dniCifColaborador: String!) {
-    colaborador(dniCifColaborador: $dniCifColaborador) {
-      dniCifColaborador
-      nombreColaborador
-      apellidosColaborador
+const { result } = useQuery(
+  gql`
+    query colaborador($dniCifColaborador: String!) {
+      colaborador(dniCifColaborador: $dniCifColaborador) {
+        dniCifColaborador
+        nombreColaborador
+        apellidosColaborador
+      }
+    }
+  `,
+  { dniCifColaborador: props.dni }
+)
+
+const { mutate: deleteColaborador } = useMutation(gql`
+  mutation deleteColaborador($dniCifColaborador: String!) {
+    deleteColaborador(dniCifColaborador: $dniCifColaborador) {
+      message
     }
   }
-`, { dniCifColaborador: props.dni })
+`)
 </script>
 
 <template>
@@ -44,7 +55,10 @@ const { result } = useQuery(gql`
           />
         </svg>
       </button>
-      <button class="deleteBtn">
+      <button
+        class="deleteBtn"
+        @click="deleteColaborador({ dniCifColaborador: result.colaborador.dniCifColaborador })"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
