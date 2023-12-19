@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ColaboradoresView from '../views/ColaboradoresView.vue'
-import AddColaboradorView from '../views/AddColaboradorView.vue'
+import FormColaboradorView from '../views/FormColaboradorView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,9 +17,9 @@ const router = createRouter({
       component: ColaboradoresView
     },
     {
-      path: '/add',
-      name: 'addcolaborador',
-      component: AddColaboradorView
+      path: '/form',
+      name: 'formcolaborador',
+      component: FormColaboradorView
     }
   ]
 })

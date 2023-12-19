@@ -1,30 +1,22 @@
-<script>
+<script setup>
 import { RouterLink } from 'vue-router'
 import ColaboradorCard from '../components/ColaboradorCard.vue'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 
-export default {
-  setup() {
-    const { result } = useQuery(gql`
-      query allColaboradores {
-        colaboradores {
-          dniCifColaborador
-          nombreColaborador
-        }
-      }
-    `)
-    return {
-      result
+const { result } = useQuery(gql`
+  query allColaboradores {
+    colaboradores {
+      dniCifColaborador
+      nombreColaborador
     }
-  },
-  components: { ColaboradorCard }
-}
+  }
+`)
 </script>
 
 <template>
   <main>
-    <RouterLink to="/add">Crear</RouterLink>
+    <RouterLink :to="{ name: 'formcolaborador' }">Crear</RouterLink>
     <ul>
       <ColaboradorCard
         v-if="result && result.colaboradores"
@@ -37,7 +29,7 @@ export default {
 </template>
 
 <style scoped>
-  ul{
-    padding: 0;
-  }
+ul {
+  padding: 0;
+}
 </style>
