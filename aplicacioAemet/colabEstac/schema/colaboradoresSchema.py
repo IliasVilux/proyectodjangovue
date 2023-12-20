@@ -70,17 +70,16 @@ class UpdateColaborador(graphene.Mutation):
 
 
 class DeleteColaborador(graphene.Mutation):
-    message = graphene.String()
+    colaborador = graphene.Field(ColaboradorType)
 
     class Arguments:
         dni_cif_colaborador = graphene.String(required=True)
 
     def mutate(self, info, dni_cif_colaborador):
         delColaborador = Colaborador.objects.get(pk=dni_cif_colaborador)
+        delColaboradorReturn = Colaborador.objects.get(pk=dni_cif_colaborador)
         delColaborador.delete()
-        return DeleteColaborador(
-            message=f"colaborador con dni {dni_cif_colaborador} se ha eliminado correctamente."
-        )
+        return DeleteColaborador(colaborador = delColaboradorReturn)
 
 
 class Query(graphene.ObjectType):

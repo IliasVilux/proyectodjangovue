@@ -1,27 +1,17 @@
 <script setup>
-import gql from 'graphql-tag'
-import { useMutation } from '@vue/apollo-composable'
-
-const props = defineProps({
-  dniCifColaborador: {
-    type: String,
-    required: true
-  }
-})
-
-const { mutate: deleteColaborador } = useMutation(gql`
-  mutation deleteColaborador($dniCifColaborador: String!) {
-    deleteColaborador(dniCifColaborador: $dniCifColaborador) {
-      message
-    }
-  }
-`)
+import { defineEmits } from 'vue';
+const emits = defineEmits(
+  ['delete']
+)
+const handleClick = () => {
+  emits('delete')
+}
 </script>
 
 <template>
   <button
     class="deleteBtn"
-    @click="deleteColaborador({ dniCifColaborador: dniCifColaborador })"
+    @click="handleClick"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

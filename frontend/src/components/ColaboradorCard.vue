@@ -3,6 +3,7 @@ import gql from 'graphql-tag'
 import { useQuery } from '@vue/apollo-composable'
 import DeleteColaboradorButton from './DeleteColaboradorButton.vue'
 import UpdateColaboradorButton from './UpdateColaboradorButton.vue'
+import { defineEmits } from 'vue';
 
 const props = defineProps({
   dni: {
@@ -10,6 +11,9 @@ const props = defineProps({
     required: true
   }
 })
+const emits = defineEmits(
+  ['delete']
+)
 
 const { result } = useQuery(
   gql`
@@ -23,6 +27,10 @@ const { result } = useQuery(
   `,
   { dniCifColaborador: props.dni }
 )
+
+const handleCkick = () => {
+  emits('delete')
+}
 </script>
 
 <template>
@@ -34,8 +42,11 @@ const { result } = useQuery(
       <p style="color: #9aa0a6">{{ result.colaborador.dniCifColaborador }}</p>
     </div>
     <div>
-      <UpdateColaboradorButton :dniCifColaborador="result.colaborador.dniCifColaborador"/>
-      <DeleteColaboradorButton :dniCifColaborador="result.colaborador.dniCifColaborador"/>
+      <UpdateColaboradorButton :dniCifColaborador="result.colaborador.dniCifColaborador" />
+      <DeleteColaboradorButton
+        :dniCifColaborador="result.colaborador.dniCifColaborador"
+        @delete="handleCkick"
+      />
     </div>
   </div>
 </template>

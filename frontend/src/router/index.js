@@ -17,7 +17,7 @@ const router = createRouter({
       component: ColaboradoresView
     },
     {
-      path: '/form',
+      path: '/form/:dniCifColaborador?',
       name: 'formcolaborador',
       component: FormColaboradorView
     }
