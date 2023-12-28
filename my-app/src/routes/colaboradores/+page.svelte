@@ -1,46 +1,85 @@
 <script>
-    export let data;
+	import ColaboradorCard from '../../components/ColaboradorCard.svelte';
+	import {
+		Client,
+		cacheExchange,
+		fetchExchange,
+		setContextClient,
+		queryStore,
+		mutationStore,
+		gql,
+		getContextClient
+	} from '@urql/svelte';
+	
+	const client = new Client({
+		url: 'http://127.0.0.1:8000/graphql/',
+		exchanges: [cacheExchange, fetchExchange]
+	});
+	setContextClient(client);
+
+	$: colaboradores = queryStore({
+		client: getContextClient(),
+		query: gql`
+			query colaboradores {
+				colaboradores {
+					dniCifColaborador
+					nombreColaborador
+				}
+			}
+		`
+	});
+
+	const deleteColaborador = (dni) => {
+		result = mutationStore({
+			client: getContextClient(),
+			query: gql`
+				mutation deleteColaborador($dniCifColaborador: String!) {
+					deleteColaborador(dniCifColaborador: $dniCifColaborador) {
+						colaborador {
+							dniCifColaborador
+							nombreColaborador
+						}
+					}
+				}
+			`,
+			variables: { dniCifColaborador: dni }
+		});
+	};
 </script>
 
 <div class="container">
-    <h1>colaboradores</h1>
+	<h1>colaboradores</h1>
 
-    <a href="colaboradores/formulario" class="btn">Agregar Nuevo Colaborador</a>
+	<a href="colaboradores/formulario" class="btn">Agregar Nuevo Colaborador</a>
 
-    {#each data.colaboradores as colaborador}
-        <div class="card">
-            <a href="colaboradores/{colaborador.dni}">{colaborador.title}</a>
-        </div>
-    {/each}
+	{#if $colaboradores.fetching}
+		<p>Loading...</p>
+	{:else if $colaboradores.error}
+		<p>Oh no... {$colaboradores.error.message}</p>
+	{:else}
+		<ul>
+			{#each $colaboradores.data.colaboradores as colaborador}
+				<ColaboradorCard
+					dni={colaborador.dniCifColaborador}
+					on:clicked={deleteColaborador(colaborador.dniCifColaborador)}
+				/>
+			{/each}
+		</ul>
+	{/if}
 </div>
 
 <style>
-    .container{
-        width: 45%;
-        margin: auto;
-        text-align: center;
-    }
-    .card{
-        display: flex;
-        align-items: center;
-        box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
-        height: 100px;
-        margin: 20px 0;
-        vertical-align: middle;
-        padding: 10px;
-        text-transform: capitalize;
-        border-radius: 10px;
-    }
-    a{
-        text-decoration: none;
-        color: #333;
-    }
-    .btn{
-        text-align: end;
-        background-color: #020D19;
-        color: #c5c5c5;
-        text-decoration: none;
-        padding: 10px;
-        border-radius: 20px;
-    }
+	.container {
+		width: 45%;
+		margin: auto;
+		text-align: center;
+	}
+	.btn {
+		margin-left: auto;
+		background-color: #020d19;
+		color: #e0e0e0;
+		text-decoration: none;
+		padding: 10px;
+		border-radius: 10px;
+	}
 </style>

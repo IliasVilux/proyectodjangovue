@@ -24,6 +24,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@urql/svelte": "^4.0.4"
+		"@urql/svelte": "^4.0.4",
+		"graphql": "^16.8.1"
 	}
 }
