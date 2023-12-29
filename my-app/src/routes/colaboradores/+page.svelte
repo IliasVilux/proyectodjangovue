@@ -1,18 +1,18 @@
 <script>
-	import ColaboradorCard from '../../components/ColaboradorCard.svelte';
 	import {
+		gql,
 		Client,
 		cacheExchange,
 		fetchExchange,
 		setContextClient,
+		getContextClient,
 		queryStore,
-		mutationStore,
-		gql,
-		getContextClient
+		mutationStore
 	} from '@urql/svelte';
-	
+	import ColaboradorCard from '../../components/ColaboradorCard.svelte';
+
 	const client = new Client({
-		url: 'http://127.0.0.1:8000/graphql/',
+		url: 'http://localhost:8000/graphql/',
 		exchanges: [cacheExchange, fetchExchange]
 	});
 	setContextClient(client);
@@ -29,9 +29,9 @@
 		`
 	});
 
-	const deleteColaborador = (dni) => {
-		result = mutationStore({
-			client: getContextClient(),
+	function deleteColaboradorMutation(dniCifColaborador) {
+		mutationStore({
+			client: client,
 			query: gql`
 				mutation deleteColaborador($dniCifColaborador: String!) {
 					deleteColaborador(dniCifColaborador: $dniCifColaborador) {
@@ -42,26 +42,30 @@
 					}
 				}
 			`,
-			variables: { dniCifColaborador: dni }
+			variables: { dniCifColaborador: dniCifColaborador }
 		});
+	}
+
+	const deleteClick = (dniCifColaborador) => {
+		deleteColaboradorMutation(dniCifColaborador);
 	};
 </script>
 
 <div class="container">
 	<h1>colaboradores</h1>
 
-	<a href="colaboradores/formulario" class="btn">Agregar Nuevo Colaborador</a>
+	<a href="colaboradores/añadir" class="btn">Agregar Nuevo Colaborador</a>
 
 	{#if $colaboradores.fetching}
 		<p>Loading...</p>
 	{:else if $colaboradores.error}
 		<p>Oh no... {$colaboradores.error.message}</p>
 	{:else}
-		<ul>
-			{#each $colaboradores.data.colaboradores as colaborador}
+		<ul style="padding: 0; margin-top: 2rem;">
+			{#each $colaboradores.data.colaboradores as colaborador (colaborador.dniCifColaborador)}
 				<ColaboradorCard
 					dni={colaborador.dniCifColaborador}
-					on:clicked={deleteColaborador(colaborador.dniCifColaborador)}
+					on:clicked={deleteClick(colaborador.dniCifColaborador)}
 				/>
 			{/each}
 		</ul>
@@ -72,14 +76,16 @@
 	.container {
 		width: 45%;
 		margin: auto;
-		text-align: center;
 	}
 	.btn {
-		margin-left: auto;
 		background-color: #020d19;
 		color: #e0e0e0;
-		text-decoration: none;
 		padding: 10px;
 		border-radius: 10px;
+	}
+	h1{
+		text-align: center;
+		text-transform: uppercase;
+		margin-bottom: 4rem;
 	}
 </style>

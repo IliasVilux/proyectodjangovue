@@ -5,23 +5,28 @@
 		fetchExchange,
 		setContextClient,
 		queryStore,
-		mutationStore,
 		gql,
-		getContextClient
+		mutationStore
 	} from '@urql/svelte';
+	import { goto } from '$app/navigation';
 
 	const client = new Client({
-		url: 'http://127.0.0.1:8000/graphql/',
+		url: 'http://localhost:8000/graphql/',
 		exchanges: [cacheExchange, fetchExchange]
 	});
 	setContextClient(client);
 
 	export let data;
+	let dataGetted = false;
+	$: form = {
+		dniCifColaborador: '',
+		nombreColaborador: ''
+	};
 
-    let colaborador = queryStore({
-		client: getContextClient(),
+	let colaborador = queryStore({
+		client: client,
 		query: gql`
-			query colaboradores($dniCifColaborador: String!) {
+			query colaborador($dniCifColaborador: String!) {
 				colaborador(dniCifColaborador: $dniCifColaborador) {
 					dniCifColaborador
 					nombreColaborador
@@ -31,32 +36,64 @@
 		variables: { dniCifColaborador: data.dniCifColaborador }
 	});
 
-	async function handleSubmit() {
-		console.log($colaborador.data.colaborador);
+	$: if ($colaborador.data && $colaborador.data.colaborador && !dataGetted) {
+		form.dniCifColaborador = $colaborador.data.colaborador.dniCifColaborador;
+		form.nombreColaborador = $colaborador.data.colaborador.nombreColaborador;
+		dataGetted = true;
+	}
+
+	function handleSubmit() {
+		if (data.dniCifColaborador === 'añadir') {
+			mutationStore({
+				client: client,
+				query: gql`
+					mutation addColaborador($dniCifColaborador: String!, $nombreColaborador: String!) {
+						addColaborador(
+							dniCifColaborador: $dniCifColaborador
+							nombreColaborador: $nombreColaborador
+						) {
+							colaborador {
+								dniCifColaborador
+								nombreColaborador
+							}
+						}
+					}
+				`,
+				variables: {
+					dniCifColaborador: form.dniCifColaborador,
+					nombreColaborador: form.nombreColaborador
+				}
+			});
+		} else {
+			mutationStore({
+				client: client,
+				query: gql`
+					mutation updateColaborador($dniCifColaborador: String!, $nombreColaborador: String!) {
+						updateColaborador(
+							dniCifColaborador: $dniCifColaborador
+							nombreColaborador: $nombreColaborador
+						) {
+							colaborador {
+								dniCifColaborador
+								nombreColaborador
+							}
+						}
+					}
+				`,
+				variables: {
+					dniCifColaborador: form.dniCifColaborador,
+					nombreColaborador: form.nombreColaborador
+				}
+			});
+		}
+		goto('/colaboradores')
 	}
 </script>
 
-{#if $colaborador.fetching}
-	<p>Loading...</p>
-{:else if $colaborador.error}
-	<p>Oh no... <b>{$colaborador.error.message}</b></p>
-{:else}
-	<form method="POST" on:submit|preventDefault={handleSubmit}>
-		<input type="text" name="dni" bind:value={$colaborador.data.colaborador.dniCifColaborador} />
-		<input
-			type="text"
-			name="name"
-			value={$colaborador.data.colaborador.nombreColaborador
-				? $colaborador.data.colaborador.nombreColaborador
-				: ''}
-		/>
-
-		{#if !data.dniCifColaborador}
-			<button type="submit" disabled={$colaborador.data.colaborador.dniCifColaborador.length < 1}
-				>Crear</button
-			>
-		{:else}
-			<button type="submit">Modificar</button>
-		{/if}
-	</form>
-{/if}
+<form on:submit|preventDefault={handleSubmit}>
+	<input type="text" name="dni" bind:value={form.dniCifColaborador} />
+	<input type="text" name="name" bind:value={form.nombreColaborador} />
+	<button type="submit" disabled={form.dniCifColaborador.length < 1}>
+		{data.dniCifColaborador === 'añadir' ? 'Crear' : 'Modificar'}
+	</button>
+</form>

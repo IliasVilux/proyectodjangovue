@@ -10,8 +10,8 @@
 <button on:click={handleClick}>
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
-		width="16"
-		height="16"
+		width="20"
+		height="20"
 		fill="#ff000f"
 		class="bi bi-trash3"
 		viewBox="0 0 16 16"
@@ -21,3 +21,23 @@
 		/>
 	</svg>
 </button>
+
+<style>
+	button{
+		background-color: white;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 4px;
+		padding: 10px;
+		cursor: pointer;
+		transition: 0.3s;
+	}
+	svg{
+		transition: 0.3s;
+	}
+	button:hover {
+		background-color: #ff000f;
+	}
+	button:hover svg {
+		fill: white;
+	}
+</style>

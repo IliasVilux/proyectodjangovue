@@ -1,3 +1,6 @@
+<script>
+</script>
+
 <nav>
     <a href="/">Home</a> |
     <a href="/colaboradores">Colaboradores</a>
@@ -12,8 +15,11 @@
         color: white;
     }
 
-    a{
+    :global(a){
         text-decoration: none;
+        color: #0B1215;
+    }
+    a{
         color: white;
     }
 </style>
