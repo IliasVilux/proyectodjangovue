@@ -1,23 +1,15 @@
 <script>
-	import { getContextClient, queryStore, gql } from "@urql/svelte";
+	import { query } from 'svelte-apollo';
 	import DeleteButton from "./DeleteButton.svelte";
-	
-	export let dni;
-	const colaborador = queryStore({
-		client: getContextClient(),
-		query: gql`
-			query colaborador($dniCifColaborador: String!) {
-				colaborador(dniCifColaborador: $dniCifColaborador) {
-					dniCifColaborador
-					nombreColaborador
-				}
-			}
-		`,
-		variables: { dniCifColaborador: dni }
-	});
+	import { GET_COLABORADOR } from '../queries/colaboradoresQuery';
+
+	export let dni
+
+	const colaborador = query(GET_COLABORADOR,
+	{ variables: {dniCifColaborador: dni} });
 </script>
 
-{#if $colaborador.fetching}
+{#if $colaborador.loading}
 	<p>Loading...</p>
 {:else if $colaborador.error}
 	<p>Oh no... {$colaborador.error.message}</p>

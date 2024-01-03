@@ -1,20 +1,12 @@
 <script>
-	import {
-		Client,
-		cacheExchange,
-		fetchExchange,
-		setContextClient,
-		queryStore,
-		gql,
-		mutationStore
-	} from '@urql/svelte';
+	import { mutation, query } from 'svelte-apollo';
+	import { gql } from '@apollo/client/core';
 	import { goto } from '$app/navigation';
-
-	const client = new Client({
-		url: 'http://localhost:8000/graphql/',
-		exchanges: [cacheExchange, fetchExchange]
-	});
-	setContextClient(client);
+	import {
+		GET_COLABORADOR,
+		ADD_COLABORADOR,
+		UPDATE_COLABORADOR
+	} from '../../../queries/colaboradoresQuery';
 
 	export let data;
 	let dataGetted = false;
@@ -23,70 +15,73 @@
 		nombreColaborador: ''
 	};
 
-	let colaborador = queryStore({
-		client: client,
-		query: gql`
-			query colaborador($dniCifColaborador: String!) {
-				colaborador(dniCifColaborador: $dniCifColaborador) {
-					dniCifColaborador
-					nombreColaborador
-				}
-			}
-		`,
+	const colaborador = query(GET_COLABORADOR, {
 		variables: { dniCifColaborador: data.dniCifColaborador }
 	});
 
-	$: if ($colaborador.data && $colaborador.data.colaborador && !dataGetted) {
+	$: if (!dataGetted && $colaborador.data && $colaborador.data.colaborador) {
 		form.dniCifColaborador = $colaborador.data.colaborador.dniCifColaborador;
 		form.nombreColaborador = $colaborador.data.colaborador.nombreColaborador;
 		dataGetted = true;
 	}
 
+	const addColaborador = mutation(ADD_COLABORADOR);
+	const updateColaborador = mutation(UPDATE_COLABORADOR);
+
 	function handleSubmit() {
 		if (data.dniCifColaborador === 'añadir') {
-			mutationStore({
-				client: client,
-				query: gql`
-					mutation addColaborador($dniCifColaborador: String!, $nombreColaborador: String!) {
-						addColaborador(
-							dniCifColaborador: $dniCifColaborador
-							nombreColaborador: $nombreColaborador
-						) {
-							colaborador {
-								dniCifColaborador
-								nombreColaborador
-							}
-						}
-					}
-				`,
+			addColaborador({
 				variables: {
 					dniCifColaborador: form.dniCifColaborador,
 					nombreColaborador: form.nombreColaborador
+				},
+				update(cache, { data: { addColaborador } }) {
+					cache.modify({
+						fields: {
+							colaboradores(existingColaboradores = []) {
+								const newColaboradorRef = cache.writeFragment({
+									data: addColaborador.colaborador,
+									fragment: gql`
+										fragment NewColaborador on Colaborador {
+											dniCifColaborador
+											type
+										}
+									`
+								});
+								return [...existingColaboradores, newColaboradorRef];
+							}
+						}
+					});
 				}
 			});
 		} else {
-			mutationStore({
-				client: client,
-				query: gql`
-					mutation updateColaborador($dniCifColaborador: String!, $nombreColaborador: String!) {
-						updateColaborador(
-							dniCifColaborador: $dniCifColaborador
-							nombreColaborador: $nombreColaborador
-						) {
-							colaborador {
-								dniCifColaborador
-								nombreColaborador
-							}
-						}
-					}
-				`,
+			updateColaborador({
 				variables: {
 					dniCifColaborador: form.dniCifColaborador,
 					nombreColaborador: form.nombreColaborador
+				},
+				update(cache, { data: { updateColaborador } }) {
+					// This way breaks because the 'dniCifColaborador' duplicates in the existing and incoming 'colaborador'
+					cache.modify({
+						fields: {
+							colaboradores(existingColaboradores = []) {
+								const newColaboradorRef = cache.writeFragment({
+									data: updateColaborador.colaborador,
+									fragment: gql`
+										fragment NewColaborador on Colaborador {
+											dniCifColaborador
+											type
+										}
+									`
+								});
+								return [...existingColaboradores, newColaboradorRef];
+							}
+						}
+					});
 				}
 			});
 		}
-		goto('/colaboradores')
+		goto('/colaboradores');
 	}
 </script>
 

@@ -1,53 +1,17 @@
 <script>
-	import {
-		gql,
-		Client,
-		cacheExchange,
-		fetchExchange,
-		setContextClient,
-		getContextClient,
-		queryStore,
-		mutationStore
-	} from '@urql/svelte';
+	import { query, mutation } from 'svelte-apollo';
+	import { gql } from '@apollo/client/core';
 	import ColaboradorCard from '../../components/ColaboradorCard.svelte';
+	import { GET_COLABORADORES, DELETE_COLABORADOR } from '../../queries/colaboradoresQuery';
 
-	const client = new Client({
-		url: 'http://localhost:8000/graphql/',
-		exchanges: [cacheExchange, fetchExchange]
-	});
-	setContextClient(client);
-
-	$: colaboradores = queryStore({
-		client: getContextClient(),
-		query: gql`
-			query colaboradores {
-				colaboradores {
-					dniCifColaborador
-					nombreColaborador
-				}
-			}
-		`
-	});
-
-	function deleteColaboradorMutation(dniCifColaborador) {
-		mutationStore({
-			client: client,
-			query: gql`
-				mutation deleteColaborador($dniCifColaborador: String!) {
-					deleteColaborador(dniCifColaborador: $dniCifColaborador) {
-						colaborador {
-							dniCifColaborador
-							nombreColaborador
-						}
-					}
-				}
-			`,
-			variables: { dniCifColaborador: dniCifColaborador }
-		});
-	}
+	const colaboradores = query(GET_COLABORADORES);
+	const deleteColaborador = mutation(DELETE_COLABORADOR);
 
 	const deleteClick = (dniCifColaborador) => {
-		deleteColaboradorMutation(dniCifColaborador);
+		deleteColaborador(
+			{ variables: { dniCifColaborador },
+			refetchQueries: ['allColaboradores']
+		 });
 	};
 </script>
 
@@ -56,7 +20,7 @@
 
 	<a href="colaboradores/añadir" class="btn">Agregar Nuevo Colaborador</a>
 
-	{#if $colaboradores.fetching}
+	{#if $colaboradores.loading}
 		<p>Loading...</p>
 	{:else if $colaboradores.error}
 		<p>Oh no... {$colaboradores.error.message}</p>
@@ -83,7 +47,7 @@
 		padding: 10px;
 		border-radius: 10px;
 	}
-	h1{
+	h1 {
 		text-align: center;
 		text-transform: uppercase;
 		margin-bottom: 4rem;
