@@ -1,7 +1,7 @@
 <script>
 	import { query } from 'svelte-apollo';
 	import DeleteButton from "./DeleteButton.svelte";
-	import { GET_COLABORADOR } from '../queries/colaboradoresQuery';
+	import { GET_COLABORADOR } from '../../queries/colaboradoresQuery';
 
 	export let dni
 

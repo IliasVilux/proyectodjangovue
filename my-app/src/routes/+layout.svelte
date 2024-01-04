@@ -1,6 +1,7 @@
 <script>
 	import { ApolloClient, InMemoryCache } from '@apollo/client/core';
 	import { setClient } from 'svelte-apollo';
+	import Header from '../lib/components/Header.svelte';
 
 	const cache = new InMemoryCache({
 		typePolicies: {
@@ -16,25 +17,13 @@
 	setClient(client);
 </script>
 
-<nav>
-	<a href="/">Home</a> |
-	<a href="/colaboradores">Colaboradores</a>
-</nav>
+<Header />
 
 <slot />
 
 <style>
-	nav {
-		background-color: #0b1215;
-		padding: 20px;
-		color: white;
-	}
-
 	:global(a) {
 		text-decoration: none;
 		color: #0b1215;
-	}
-	a {
-		color: white;
 	}
 </style>

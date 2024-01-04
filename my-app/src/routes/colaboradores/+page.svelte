@@ -1,7 +1,6 @@
 <script>
 	import { query, mutation } from 'svelte-apollo';
-	import { gql } from '@apollo/client/core';
-	import ColaboradorCard from '../../components/ColaboradorCard.svelte';
+	import ColaboradorCard from '../../lib/components/ColaboradorCard.svelte';
 	import { GET_COLABORADORES, DELETE_COLABORADOR } from '../../queries/colaboradoresQuery';
 
 	const colaboradores = query(GET_COLABORADORES);

@@ -59,25 +59,6 @@
 				variables: {
 					dniCifColaborador: form.dniCifColaborador,
 					nombreColaborador: form.nombreColaborador
-				},
-				update(cache, { data: { updateColaborador } }) {
-					// This way breaks because the 'dniCifColaborador' duplicates in the existing and incoming 'colaborador'
-					cache.modify({
-						fields: {
-							colaboradores(existingColaboradores = []) {
-								const newColaboradorRef = cache.writeFragment({
-									data: updateColaborador.colaborador,
-									fragment: gql`
-										fragment NewColaborador on Colaborador {
-											dniCifColaborador
-											type
-										}
-									`
-								});
-								return [...existingColaboradores, newColaboradorRef];
-							}
-						}
-					});
 				}
 			});
 		}
