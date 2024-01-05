@@ -2,8 +2,10 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@vue/apollo-composable'
+import { GET_COLABORADORES, GET_COLABORADOR } from '@/graphql/Queries/Colaboradores.js'
+import { ADD_COLABORADOR, UPDATE_COLABORADOR } from '@/graphql/Mutations/Colaboradores.js'
+import { gql } from '@apollo/client/core'
 
 var modoEdicion = false // false en caso de crear, true en caso de modificar a un colaborador
 
@@ -23,15 +25,7 @@ onMounted(() => {
     entryData.value.dniCifColaborador = route.params.dniCifColaborador
 
     const { result } = useQuery(
-      gql`
-        query colaborador($dniCifColaborador: String!) {
-          colaborador(dniCifColaborador: $dniCifColaborador) {
-            dniCifColaborador
-            nombreColaborador
-            apellidosColaborador
-          }
-        }
-      `,
+      GET_COLABORADOR,
       { dniCifColaborador: dniCifColaborador.value }
     )
     nombreColaborador.value = result.value.colaborador.nombreColaborador
@@ -42,49 +36,28 @@ onMounted(() => {
 })
 
 const { mutate: addColaboradorMutation } = useMutation(
-  gql`
-    mutation addColaborador($dniCifColaborador: String!, $nombreColaborador: String!) {
-      addColaborador(dniCifColaborador: $dniCifColaborador, nombreColaborador: $nombreColaborador) {
-        colaborador {
-          dniCifColaborador
-          nombreColaborador
-        }
-      }
-    }
-  `,
-  () => ({
-    update(cache, { data: { addColaborador } }) {
-      cache.writeQuery({
-        query: gql`
-          query allColaboradores {
-            colaboradores {
-              dniCifColaborador
-              nombreColaborador
-            }
-          }
-        `,
-        data: {
-          colaboradores: addColaborador
-        }
-      })
-    }
-  })
+  ADD_COLABORADOR,
+  // () => ({
+  //   update(cache, { data: { addColaborador } }) {
+  //     cache.modify({
+  //       fields: {
+  //         colaboradores(existingColaboradores = []) {
+  //           const newColaboradorRef = cache.writeFragment({
+  //             data: addColaborador,
+  //             fragment: gql`
+  //             fragment NewColaborador on ColaboradorType {
+  //               dniCifColaborador
+  //               type
+  //             }`
+  //           })
+  //           return [...existingColaboradores, newColaboradorRef]
+  //         }
+  //       }
+  //     })
+  //   }
+  // })
 )
-
-const { mutate: updateColaboradorMutation } = useMutation(
-  gql`
-    mutation updateColaborador($dniCifColaborador: String!, $nombreColaborador: String!) {
-      updateColaborador(
-        dniCifColaborador: $dniCifColaborador
-        nombreColaborador: $nombreColaborador
-      ) {
-        colaborador {
-          dniCifColaborador
-          nombreColaborador
-        }
-      }
-    }
-  `)
+const { mutate: updateColaboradorMutation } = useMutation(UPDATE_COLABORADOR)
 
 const enviarFormulario = async () => {
   try {

@@ -1,9 +1,9 @@
 <script setup>
-import gql from 'graphql-tag'
-import { useQuery } from '@vue/apollo-composable'
 import DeleteColaboradorButton from './DeleteColaboradorButton.vue'
 import UpdateColaboradorButton from './UpdateColaboradorButton.vue'
 import { defineEmits } from 'vue';
+import { useQuery } from '@vue/apollo-composable'
+import { GET_COLABORADOR } from '../graphql/Queries/Colaboradores.js'
 
 const props = defineProps({
   dni: {
@@ -11,29 +11,22 @@ const props = defineProps({
     required: true
   }
 })
-const emits = defineEmits(
-  ['delete']
-)
-
-const { result } = useQuery(
-  gql`
-    query colaborador($dniCifColaborador: String!) {
-      colaborador(dniCifColaborador: $dniCifColaborador) {
-        dniCifColaborador
-        nombreColaborador
-        apellidosColaborador
-      }
-    }
-  `,
+const { result, loading, error } = useQuery(
+  GET_COLABORADOR,
   { dniCifColaborador: props.dni }
 )
 
+const emits = defineEmits(
+  ['delete']
+)
 const handleCkick = () => {
   emits('delete')
 }
 </script>
 
 <template>
+  <div v-if="loading">Loading...</div>
+  <div v-if="error">Oh no... {{ error }}</div>
   <div v-if="result && result.colaborador" class="colaboradorCard">
     <div>
       <p>
@@ -43,10 +36,7 @@ const handleCkick = () => {
     </div>
     <div>
       <UpdateColaboradorButton :dniCifColaborador="result.colaborador.dniCifColaborador" />
-      <DeleteColaboradorButton
-        :dniCifColaborador="result.colaborador.dniCifColaborador"
-        @delete="handleCkick"
-      />
+      <DeleteColaboradorButton :dniCifColaborador="result.colaborador.dniCifColaborador" @delete="handleCkick" />
     </div>
   </div>
 </template>

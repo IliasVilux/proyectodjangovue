@@ -16,7 +16,8 @@
 {:else}
 	<div class="card">
 		<a class="btn" href="colaboradores/{$colaborador.data.colaborador.dniCifColaborador}">
-			{$colaborador.data.colaborador.nombreColaborador}
+			<h1>{$colaborador.data.colaborador.nombreColaborador}</h1>
+			<p style="opacity: 50%; margin-top: 0.4em;">{$colaborador.data.colaborador.dniCifColaborador}</p>
 		</a>
 		<DeleteButton on:clicked />
 	</div>
@@ -36,5 +37,8 @@
 		padding: 10px 30px;
 		text-transform: capitalize;
 		border-radius: 10px;
+	}
+	.card *{
+		margin: 0;
 	}
 </style>

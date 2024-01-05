@@ -67,7 +67,7 @@
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>
-	<input type="text" name="dni" bind:value={form.dniCifColaborador} />
+	<input type="text" name="dni" bind:value={form.dniCifColaborador} disabled={data.dniCifColaborador !== 'añadir'}/>
 	<input type="text" name="name" bind:value={form.nombreColaborador} />
 	<button type="submit" disabled={form.dniCifColaborador.length < 1}>
 		{data.dniCifColaborador === 'añadir' ? 'Crear' : 'Modificar'}

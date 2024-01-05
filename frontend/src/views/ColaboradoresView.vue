@@ -1,60 +1,22 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import ColaboradorCard from '../components/ColaboradorCard.vue'
+import ColaboradorCard from '@/components/ColaboradorCard.vue'
+import { gql } from '@apollo/client/core'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import gql from 'graphql-tag'
+import { GET_COLABORADORES } from '@/graphql/Queries/Colaboradores.js'
+import { DELETE_COLABORADOR } from '@/graphql/Mutations/Colaboradores.js'
 
-const { result } = useQuery(gql`
-  query allColaboradores {
-    colaboradores {
-      dniCifColaborador
-      nombreColaborador
-    }
-  }
-`)
+const { result, loading, error, refetch } = useQuery(GET_COLABORADORES)
 
 const { mutate: deleteColaboradorMutation } = useMutation(
-  gql`
-    mutation deleteColaborador($dniCifColaborador: String!) {
-      deleteColaborador(dniCifColaborador: $dniCifColaborador) {
-        colaborador {
-          dniCifColaborador
-          nombreColaborador
-        }
-      }
-    }
-  `,
+  DELETE_COLABORADOR,
   () => ({
     update(cache, { data: { deleteColaborador } }) {
-      const data = cache.readQuery({
-        query: gql`
-          query allColaboradores {
-            colaboradores {
-              dniCifColaborador
-              nombreColaborador
-            }
-          }
-        `
-      })
-
-      const updatedColaboradores = data.colaboradores.filter(
-        (colaborador) => colaborador.dniCifColaborador !== deleteColaborador.colaborador.dniCifColaborador
-      )
-      cache.writeQuery({
-        query: gql`
-          query allColaboradores {
-            colaboradores {
-              dniCifColaborador
-              nombreColaborador
-            }
-          }
-        `,
-        data: {
-          colaboradores: updatedColaboradores
-        }
-      })
+      let data = cache.readQuery({ query: GET_COLABORADORES })
+      cache.writeQuery({ query: GET_COLABORADORES, data })
     }
-  })
+  }),
+  refetch
 )
 
 const deleteCol = (dni) => {
@@ -65,14 +27,12 @@ const deleteCol = (dni) => {
 <template>
   <main>
     <RouterLink :to="{ name: 'formcolaborador' }">Crear</RouterLink>
-    <ul>
-      <ColaboradorCard
-        v-if="result && result.colaboradores"
-        v-for="colaborador in result.colaboradores"
-        :key="colaborador.dniCifColaborador"
-        :dni="colaborador.dniCifColaborador"
-        @delete="deleteCol(colaborador.dniCifColaborador)"
-      />
+    <div v-if="loading">Loading...</div>
+    <div v-else-if="error">Error: {{ error.message }}</div>
+    <ul v-else-if="result && result.colaboradores">
+      <ColaboradorCard v-if="result && result.colaboradores" v-for="colaborador in result.colaboradores"
+        :key="colaborador.dniCifColaborador" :dni="colaborador.dniCifColaborador"
+        @delete="deleteCol(colaborador.dniCifColaborador)" />
     </ul>
   </main>
 </template>
