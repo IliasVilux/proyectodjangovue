@@ -22,17 +22,18 @@ const emits = defineEmits(
 const handleCkick = () => {
   emits('delete')
 }
+
 </script>
 
 <template>
-  <div v-if="loading">Loading...</div>
-  <div v-if="error">Oh no... {{ error }}</div>
+  <div v-if="loading" class="loading">Loading...</div>
+  <div v-if="error" class="error">Oh no... {{ error }}</div>
   <div v-if="result && result.colaborador" class="colaboradorCard">
     <div>
-      <p>
+      <p class="nombre">
         {{ result.colaborador.nombreColaborador }} {{ result.colaborador.apellidosColaborador }}
       </p>
-      <p style="color: #9aa0a6">{{ result.colaborador.dniCifColaborador }}</p>
+      <p style="color: #9aa0a6" id="dni">{{ result.colaborador.dniCifColaborador }}</p>
     </div>
     <div>
       <UpdateColaboradorButton :dniCifColaborador="result.colaborador.dniCifColaborador" />

@@ -8,7 +8,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <RouterLink :to="{name: 'formcolaborador', params: {dniCifColaborador: dniCifColaborador}}">
+  <RouterLink class="button" :to="{name: 'formcolaborador', params: {dniCifColaborador: dniCifColaborador}}">
     <button class="editBtn" @click="editForm">
       <svg
         xmlns="http://www.w3.org/2000/svg"

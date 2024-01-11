@@ -12,7 +12,7 @@ COLORS = {
 }
 
 OHMS = {
-    'ohms': 1,
+    'ohms': 1e3,
     'kiloohms': 1e6,
     'megaohms': 1e9,
     'gigaohms': 1e12
@@ -25,18 +25,15 @@ def label(colors: [str, str, str]) -> str:
     if (prefix == '00'):
         return '0 ohms'
     
-    prefix += ''.join(['0' for _ in range(COLORS[colors[2]])])
-    return ''.join(str(value) for value in OHMS.values() if round(int(prefix)) < value)
-    # return next(f'{round(int(prefix) / exp)} {unit}' for unit, exp in OHMS.items() if int(prefix) < exp)
+    prefix += '0' * COLORS[colors[2]]
 
-    # prefix_numeric = int(prefix)
-    # if prefix_numeric < 1e3:
-    #     return f'{round(prefix_numeric)} ohms'
-    # elif prefix_numeric < 1e6:
-    #     return f'{round(prefix_numeric/1e3)} kiloohms'
-    # elif prefix_numeric < 1e9:
-    #     return f'{round(prefix_numeric/1e6)} megaohms'
-    # elif prefix_numeric < 1e12:
-    #     return f'{round(prefix_numeric/1e9)} gigaohms'
+    previous_value = ''
+    for key, value in OHMS.items():
+        if int(prefix) < value:
+            if previous_value != '':
+                return f'{round(int(prefix)/OHMS[previous_value])} {key}'
+            else:
+                return f'{round(int(prefix))} {key}'
+        previous_value = key
 
-print(label(["white", "white", "white"]))
+print(label(["orange", "orange", "black"]))
